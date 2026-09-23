@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mitfahr-Rotation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg: #f3f1ea;
+  --surface: #ffffff;
+  --surface-alt: #ece6d8;
+  --border: #ddd4bd;
+  --ink: #201c14;
+  --ink-muted: #6b6455;
+  --primary: #1f4d8f;
+  --primary-ink: #ffffff;
+  --accent: #d97b2b;
+  --accent-ink: #2b1400;
+  --accent-soft: #f6dfc2;
+  --danger-soft: #f6d4c2;
+  --danger-ink: #5c1a00;
+  --font-display: 'Lexend', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --bg: #14171c;
+    --surface: #1d2128;
+    --surface-alt: #262b33;
+    --border: #333944;
+    --ink: #e9e7df;
+    --ink-muted: #9aa0ab;
+    --primary: #7fa8e0;
+    --primary-ink: #0c1420;
+    --accent: #eb9c4c;
+    --accent-ink: #2b1400;
+    --accent-soft: #4a3520;
+    --danger-soft: #4a2416;
+    --danger-ink: #ffd9c2;
+  }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height:1.5;
+}
+img{max-width:100%;}
+[hidden]{display:none!important;}
+#app{max-width:640px; margin:0 auto; padding-bottom: 20px;}
+.topbar{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding:22px 20px 6px;}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand-mark{color:var(--primary); display:flex;}
+.topbar-actions{display:flex; gap:8px;}
+h1{font-family:var(--font-display); font-size:1.3rem; margin:0; letter-spacing:-0.01em;}
+h2{font-family:var(--font-display); font-size:1rem; margin:0 0 10px;}
+h3{font-family:var(--font-display); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-muted); margin:16px 0 8px; font-weight:600;}
+.icon-btn{background:var(--surface-alt); border:1px solid var(--border); color:var(--ink); border-radius:999px; padding:9px 16px; font-family:var(--font-body); font-size:.85rem; cursor:pointer;}
+.icon-btn:hover{background:var(--border);}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; margin:14px 20px;}
+.hint{color:var(--ink-muted); font-size:.85rem; margin:0 0 12px;}
+.chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{font-family:var(--font-body); font-size:.9rem; padding:9px 16px; border-radius:999px; border:1px solid var(--border); background:var(--surface-alt); color:var(--ink); cursor:pointer; transition: background .15s, border-color .15s, color .15s;}
+.chip-active{background:var(--primary); border-color:var(--primary); color:var(--primary-ink);}
+.suggestion-card{border-color:var(--accent-soft);}
+.next-driver-box{display:flex; flex-direction:column; gap:2px; background:var(--accent-soft); border-radius:10px; padding:14px 16px; margin-bottom:6px;}
+.next-label{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-ink); opacity:.75;}
+.next-name{font-family:var(--font-display); font-size:1.4rem; font-weight:600; color:var(--accent-ink);}
+.queue-list{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px;}
+.queue-item{font-variant-numeric: tabular-nums; padding:6px 12px; border-radius:8px; background:var(--surface-alt); border:1px solid var(--border); font-size:.85rem;}
+.queue-item-next{border-color:var(--primary); color:var(--primary); font-weight:600;}
+.last-trip{font-size:.82rem; color:var(--ink-muted); margin-top:10px;}
+.confirm-row{display:flex; flex-wrap:wrap; gap:14px; margin-bottom:12px;}
+.confirm-row label{display:flex; flex-direction:column; gap:4px; font-size:.8rem; color:var(--ink-muted); flex:1; min-width:140px;}
+select, input[type=date], input[type=text], input[type=password]{font-family:var(--font-body); font-size:.9rem; padding:9px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--ink);}
+.btn{font-family:var(--font-body); font-size:.9rem; font-weight:600; padding:10px 18px; border-radius:10px; border:1px solid transparent; cursor:pointer; background:var(--primary); color:var(--primary-ink);}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
+.btn-small{padding:7px 12px; font-size:.8rem;}
+.status-line{font-size:.8rem; color:var(--ink-muted); margin-top:8px;}
+.banner{margin:14px 20px; padding:12px 16px; border-radius:10px; background:var(--danger-soft); color:var(--danger-ink); font-size:.85rem;}
+.overview-group{margin-bottom:14px;}
+.overview-table{display:flex; flex-direction:column; gap:1px; border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+.overview-row{display:flex; justify-content:space-between; gap:12px; padding:9px 12px; background:var(--surface); font-size:.85rem;}
+.overview-row:nth-child(even){background:var(--surface-alt);}
+.overview-next{color:var(--primary); font-weight:600;}
+.settings-panel .name-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px;}
+.settings-panel label{display:flex; flex-direction:column; gap:4px; font-size:.78rem; color:var(--ink-muted);}
+.history-list{display:flex; flex-direction:column; gap:1px; border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+.history-row{display:flex; flex-direction:column; gap:6px; padding:9px 12px; background:var(--surface); font-size:.85rem;}
+.history-row:nth-child(even){background:var(--surface-alt);}
+.history-row-main{display:flex; align-items:center; gap:12px;}
+.history-date{font-variant-numeric:tabular-nums; color:var(--ink-muted); min-width:72px;}
+.history-combo{flex:1;}
+.history-driver{font-weight:600; color:var(--primary); white-space:nowrap;}
+.history-delete-btn{background:none; border:none; color:var(--ink-muted); font-size:1.15rem; line-height:1; cursor:pointer; padding:3px 8px; border-radius:6px;}
+.history-delete-btn:hover{background:var(--surface-alt); color:var(--danger-ink);}
+.history-confirm-line{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+.history-pw-input{width:110px;}
+.history-error{color:var(--danger-ink); font-size:.78rem; margin:0;}
+.foot-note{text-align:center; color:var(--ink-muted); font-size:.75rem; padding:4px 20px 28px;}
+@media (max-width:480px){
+  .name-grid{grid-template-columns:1fr;}
+  .confirm-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="5" cy="19" r="2"></circle>
+          <circle cx="19" cy="5" r="2"></circle>
+          <path d="M7 19h6a3 3 0 0 0 3-3v-2a3 3 0 0 1 3-3" stroke-dasharray="3 3"></path>
+        </svg>
+      </span>
+      <h1>Mitfahr-Rotation</h1>
+    </div>
+    <div class="topbar-actions">
+      <button id="toggleHistory" class="icon-btn" type="button" aria-expanded="false">Verlauf</button>
+      <button id="toggleSettings" class="icon-btn" type="button" aria-expanded="false">Namen</button>
+    </div>
+  </header>
+
+  <p id="connError" class="banner" hidden>Verbindung zur Datenbank nicht möglich. Prüfe deine Internetverbindung – die Seite versucht automatisch, sich neu zu verbinden.</p>
+
+  <section id="historyPanel" class="card history-panel" hidden>
+    <h2>Verlauf</h2>
+    <p class="hint">Alle eingetragenen Fahrten, neueste zuerst – je Kombination die letzten 30.</p>
+    <div id="historyList" class="history-list"></div>
+    <p id="historyEmpty" class="hint" hidden>Noch keine Fahrten eingetragen.</p>
+    <p id="historyStatus" class="status-line" hidden></p>
+  </section>
+
+  <section id="settingsPanel" class="card settings-panel" hidden>
+    <h2>Namen der 4 Personen</h2>
+    <div class="name-grid">
+      <label>Person 1<input type="text" id="name0" maxlength="30"></label>
+      <label>Person 2<input type="text" id="name1" maxlength="30"></label>
+      <label>Person 3<input type="text" id="name2" maxlength="30"></label>
+      <label>Person 4<input type="text" id="name3" maxlength="30"></label>
+    </div>
+    <button id="saveNames" class="btn" type="button">Namen speichern</button>
+    <p id="namesStatus" class="status-line" hidden></p>
+  </section>
+
+  <section class="card">
+    <h2>Wer fährt heute mit?</h2>
+    <p class="hint">Mindestens zwei Personen auswählen.</p>
+    <div id="peopleChips" class="chip-row"></div>
+  </section>
+
+  <section id="suggestionCard" class="card suggestion-card" hidden>
+    <h2>Diese Kombination</h2>
+    <div id="nextDriverBox" class="next-driver-box"></div>
+    <h3>Reihenfolge</h3>
+    <ol id="queueList" class="queue-list"></ol>
+    <p id="lastTripInfo" class="last-trip" hidden></p>
+
+    <h3>Fahrt eintragen</h3>
+    <div class="confirm-row">
+      <label>Gefahren ist
+        <select id="driverSelect"></select>
+      </label>
+      <label>Datum
+        <input type="date" id="tripDate">
+      </label>
+    </div>
+    <button id="confirmTrip" class="btn" type="button">Fahrt speichern</button>
+    <p id="confirmStatus" class="status-line" hidden></p>
+  </section>
+
+  <section class="card">
+    <h2>Übersicht aller Kombinationen</h2>
+    <div id="overviewGroups"></div>
+  </section>
+
+  <p class="foot-note">Änderungen werden für alle vier gespeichert und live an alle übertragen.</p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyDnBB5o1QVtt85ZoPMIREyNH-Ri66kSeHw",
+    authDomain: "eifelexpress-d5225.firebaseapp.com",
+    projectId: "eifelexpress-d5225",
+    storageBucket: "eifelexpress-d5225.firebasestorage.app",
+    messagingSenderId: "609356386373",
+    appId: "1:609356386373:web:b6fe60a667a64d2343932c"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+  var stateRef = doc(db, "state", "shared");
+
+  var DEFAULT_STATE = {
+    names: ["Fahrer 1","Fahrer 2","Fahrer 3","Fahrer 4"],
+    combos: {}
+  };
+
+  var STATE = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  var selected = new Set();
+  var saving = false;
+  var firstSnapshotSeen = false;
+  var DELETE_PASSWORD = '1702';
+  var pendingDelete = null;
+  var deleteError = false;
+
+  function comboKey(idxs){ return idxs.slice().sort(function(a,b){return a-b;}).join('-'); }
+
+  function combinations(arr, k){
+    var out = [];
+    function rec(start, chosen){
+      if(chosen.length === k){ out.push(chosen.slice()); return; }
+      for(var i=start;i<arr.length;i++){ chosen.push(arr[i]); rec(i+1, chosen); chosen.pop(); }
+    }
+    rec(0, []);
+    return out;
+  }
+
+  function allCombos(){
+    var idxs = [0,1,2,3];
+    var res = [];
+    [2,3,4].forEach(function(k){
+      combinations(idxs,k).forEach(function(c){ res.push({key: comboKey(c), idxs: c, size: k}); });
+    });
+    return res;
+  }
+
+  function getOrder(key, idxs){
+    var entry = STATE.combos[key];
+    if(entry && Array.isArray(entry.order) && entry.order.length === idxs.length){
+      var setB = new Set(idxs);
+      var valid = entry.order.every(function(i){ return setB.has(i); });
+      if(valid) return entry.order.slice();
+    }
+    return idxs.slice().sort(function(a,b){return a-b;});
+  }
+
+  function getHistory(key){
+    var entry = STATE.combos[key];
+    return (entry && Array.isArray(entry.history)) ? entry.history : [];
+  }
+
+  function nameOf(i){ return STATE.names[i] || ('Person ' + (i+1)); }
+
+  function todayISO(){
+    var d = new Date();
+    var local = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+    return local.toISOString().slice(0,10);
+  }
+
+  function fmtDate(iso){
+    if(!iso) return '';
+    var parts = iso.split('-');
+    if(parts.length!==3) return iso;
+    return parts[2] + '.' + parts[1] + '.' + parts[0];
+  }
+
+  function render(){
+    renderNameInputs();
+    renderChips();
+    renderSuggestion();
+    renderOverview();
+    renderHistory();
+  }
+
+  function renderNameInputs(){
+    for(var i=0;i<4;i++){
+      var inp = document.getElementById('name'+i);
+      if(inp && document.activeElement !== inp) inp.value = STATE.names[i];
+    }
+  }
+
+  function renderChips(){
+    var wrap = document.getElementById('peopleChips');
+    wrap.innerHTML = '';
+    for(var i=0;i<4;i++){
+      (function(i){
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip' + (selected.has(i) ? ' chip-active' : '');
+        btn.textContent = nameOf(i);
+        btn.addEventListener('click', function(){
+          if(selected.has(i)) selected.delete(i); else selected.add(i);
+          render();
+        });
+        wrap.appendChild(btn);
+      })(i);
+    }
+  }
+
+  function renderSuggestion(){
+    var card = document.getElementById('suggestionCard');
+    if(selected.size < 2){ card.hidden = true; return; }
+    card.hidden = false;
+    var idxs = Array.from(selected).sort(function(a,b){return a-b;});
+    var key = comboKey(idxs);
+    var order = getOrder(key, idxs);
+    var nextIdx = order[0];
+
+    var box = document.getElementById('nextDriverBox');
+    box.innerHTML = '';
+    var lbl = document.createElement('span');
+    lbl.className = 'next-label';
+    lbl.textContent = 'Nächste Person am Steuer';
+    var nm = document.createElement('span');
+    nm.className = 'next-name';
+    nm.textContent = nameOf(nextIdx);
+    box.appendChild(lbl);
+    box.appendChild(nm);
+
+    var list = document.getElementById('queueList');
+    list.innerHTML = '';
+    order.forEach(function(idx,pos){
+      var li = document.createElement('li');
+      li.className = 'queue-item' + (pos===0 ? ' queue-item-next' : '');
+      li.textContent = (pos+1) + '. ' + nameOf(idx);
+      list.appendChild(li);
+    });
+
+    var hist = getHistory(key);
+    var lastInfo = document.getElementById('lastTripInfo');
+    if(hist.length){
+      lastInfo.hidden = false;
+      lastInfo.textContent = 'Zuletzt gefahren: ' + nameOf(hist[0].driver) + ' am ' + fmtDate(hist[0].date);
+    } else {
+      lastInfo.hidden = true;
+      lastInfo.textContent = '';
+    }
+
+    var sel = document.getElementById('driverSelect');
+    var prevVal = sel.value;
+    sel.innerHTML = '';
+    idxs.forEach(function(idx){
+      var opt = document.createElement('option');
+      opt.value = String(idx);
+      opt.textContent = nameOf(idx);
+      sel.appendChild(opt);
+    });
+    sel.value = idxs.indexOf(Number(prevVal)) !== -1 ? prevVal : String(nextIdx);
+
+    var dateInput = document.getElementById('tripDate');
+    if(!dateInput.value) dateInput.value = todayISO();
+
+    document.getElementById('confirmTrip').disabled = saving;
+  }
+
+  function renderOverview(){
+    var wrap = document.getElementById('overviewGroups');
+    wrap.innerHTML = '';
+    var groups = [[2,'Zu zweit'],[3,'Zu dritt'],[4,'Alle vier']];
+    var combos = allCombos();
+    groups.forEach(function(g){
+      var size = g[0], label = g[1];
+      var items = combos.filter(function(c){ return c.size===size; });
+      var groupEl = document.createElement('div');
+      groupEl.className = 'overview-group';
+      var h3 = document.createElement('h3');
+      h3.textContent = label;
+      groupEl.appendChild(h3);
+      var table = document.createElement('div');
+      table.className = 'overview-table';
+      items.forEach(function(c){
+        var order = getOrder(c.key, c.idxs);
+        var row = document.createElement('div');
+        row.className = 'overview-row';
+        var membersEl = document.createElement('span');
+        membersEl.className = 'overview-members';
+        membersEl.textContent = c.idxs.map(nameOf).join(' + ');
+        var nextEl = document.createElement('span');
+        nextEl.className = 'overview-next';
+        nextEl.textContent = nameOf(order[0]);
+        row.appendChild(membersEl);
+        row.appendChild(nextEl);
+        table.appendChild(row);
+      });
+      groupEl.appendChild(table);
+      wrap.appendChild(groupEl);
+    });
+  }
+
+  function renderHistory(){
+    var list = document.getElementById('historyList');
+    var emptyMsg = document.getElementById('historyEmpty');
+    list.innerHTML = '';
+    var rows = [];
+    Object.keys(STATE.combos).forEach(function(key){
+      var entry = STATE.combos[key];
+      var idxs = key.split('-').map(Number);
+      var hist = (entry && Array.isArray(entry.history)) ? entry.history : [];
+      hist.forEach(function(h){
+        rows.push({date: h.date, driver: h.driver, idxs: idxs, key: key, entryRef: h});
+      });
+    });
+    rows.sort(function(a,b){
+      if(a.date === b.date) return 0;
+      return a.date < b.date ? 1 : -1;
+    });
+    if(rows.length === 0){
+      emptyMsg.hidden = false;
+      return;
+    }
+    emptyMsg.hidden = true;
+    rows.forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'history-row';
+
+      var mainLine = document.createElement('div');
+      mainLine.className = 'history-row-main';
+
+      var dateEl = document.createElement('span');
+      dateEl.className = 'history-date';
+      dateEl.textContent = fmtDate(r.date);
+      var comboEl = document.createElement('span');
+      comboEl.className = 'history-combo';
+      comboEl.textContent = r.idxs.map(nameOf).join(' + ');
+      var driverEl = document.createElement('span');
+      driverEl.className = 'history-driver';
+      driverEl.textContent = nameOf(r.driver);
+
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'history-delete-btn';
+      delBtn.setAttribute('aria-label', 'Eintrag löschen');
+      delBtn.textContent = '×';
+      delBtn.addEventListener('click', function(){
+        var isSame = pendingDelete && pendingDelete.entryRef === r.entryRef;
+        pendingDelete = isSame ? null : {key: r.key, entryRef: r.entryRef};
+        deleteError = false;
+        renderHistory();
+      });
+
+      mainLine.appendChild(dateEl);
+      mainLine.appendChild(comboEl);
+      mainLine.appendChild(driverEl);
+      mainLine.appendChild(delBtn);
+      row.appendChild(mainLine);
+
+      if(pendingDelete && pendingDelete.entryRef === r.entryRef){
+        var confirmLine = document.createElement('div');
+        confirmLine.className = 'history-confirm-line';
+
+        var pwInput = document.createElement('input');
+        pwInput.type = 'password';
+        pwInput.placeholder = 'Passwort';
+        pwInput.className = 'history-pw-input';
+        pwInput.addEventListener('keydown', function(ev){
+          if(ev.key === 'Enter') confirmBtn.click();
+        });
+
+        var confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.className = 'btn btn-small';
+        confirmBtn.textContent = 'Löschen';
+        confirmBtn.addEventListener('click', function(){
+          if(pwInput.value !== DELETE_PASSWORD){
+            deleteError = true;
+            renderHistory();
+            return;
+          }
+          var combo = STATE.combos[r.key];
+          var beforeLen = (combo && Array.isArray(combo.history)) ? combo.history.length : 0;
+          var newHist = (combo && Array.isArray(combo.history)) ? combo.history.filter(function(x){ return x !== r.entryRef; }) : [];
+          pendingDelete = null;
+          if(newHist.length === beforeLen){
+            deleteError = true;
+            renderHistory();
+            return;
+          }
+          deleteError = false;
+          var newCombos = Object.assign({}, STATE.combos);
+          newCombos[r.key] = Object.assign({}, combo, {history: newHist});
+          var newState = Object.assign({}, STATE, {combos: newCombos});
+          saveState(newState, document.getElementById('historyStatus'));
+        });
+
+        var cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'icon-btn btn-small';
+        cancelBtn.textContent = 'Abbrechen';
+        cancelBtn.addEventListener('click', function(){
+          pendingDelete = null;
+          deleteError = false;
+          renderHistory();
+        });
+
+        confirmLine.appendChild(pwInput);
+        confirmLine.appendChild(confirmBtn);
+        confirmLine.appendChild(cancelBtn);
+        row.appendChild(confirmLine);
+
+        if(deleteError){
+          var errEl = document.createElement('p');
+          errEl.className = 'history-error';
+          errEl.textContent = 'Falsches Passwort oder Eintrag existiert nicht mehr.';
+          row.appendChild(errEl);
+        }
+      }
+
+      list.appendChild(row);
+    });
+
+    if(pendingDelete){
+      var focusInput = list.querySelector('.history-pw-input');
+      if(focusInput) focusInput.focus();
+    }
+  }
+
+  function saveState(newState, statusEl){
+    saving = true; render();
+    if(statusEl){ statusEl.hidden = false; statusEl.textContent = 'Speichere…'; }
+    setDoc(stateRef, newState).then(function(){
+      if(statusEl){
+        statusEl.textContent = 'Gespeichert.';
+        setTimeout(function(){ statusEl.hidden = true; }, 1500);
+      }
+    }).catch(function(err){
+      if(statusEl){
+        statusEl.hidden = false;
+        statusEl.textContent = 'Speichern fehlgeschlagen: ' + ((err && err.message) ? err.message : 'unbekannter Fehler');
+      }
+    }).finally(function(){
+      saving = false; render();
+    });
+  }
+
+  document.getElementById('toggleSettings').addEventListener('click', function(){
+    var panel = document.getElementById('settingsPanel');
+    panel.hidden = !panel.hidden;
+    document.getElementById('toggleSettings').setAttribute('aria-expanded', String(!panel.hidden));
+  });
+
+  document.getElementById('toggleHistory').addEventListener('click', function(){
+    var panel = document.getElementById('historyPanel');
+    panel.hidden = !panel.hidden;
+    document.getElementById('toggleHistory').setAttribute('aria-expanded', String(!panel.hidden));
+  });
+
+  document.getElementById('saveNames').addEventListener('click', function(){
+    var newNames = [0,1,2,3].map(function(i){
+      var v = document.getElementById('name'+i).value.trim();
+      return v || STATE.names[i] || ('Person ' + (i+1));
+    });
+    var newState = Object.assign({}, STATE, {names: newNames});
+    saveState(newState, document.getElementById('namesStatus'));
+  });
+
+  document.getElementById('confirmTrip').addEventListener('click', function(){
+    if(selected.size < 2) return;
+    var idxs = Array.from(selected).sort(function(a,b){return a-b;});
+    var key = comboKey(idxs);
+    var order = getOrder(key, idxs);
+    var driverIdx = Number(document.getElementById('driverSelect').value);
+    if(idxs.indexOf(driverIdx) === -1) return;
+    var date = document.getElementById('tripDate').value || todayISO();
+    var newOrder = order.filter(function(i){ return i!==driverIdx; }).concat([driverIdx]);
+    var newHistory = [{date: date, driver: driverIdx}].concat(getHistory(key)).slice(0,30);
+    var newCombos = Object.assign({}, STATE.combos);
+    newCombos[key] = {order: newOrder, history: newHistory};
+    var newState = Object.assign({}, STATE, {combos: newCombos});
+    saveState(newState, document.getElementById('confirmStatus'));
+  });
+
+  render();
+
+  onSnapshot(stateRef, function(snap){
+    document.getElementById('connError').hidden = true;
+    if(snap.exists()){
+      var data = snap.data();
+      if(data && Array.isArray(data.names) && data.names.length===4 && data.combos && typeof data.combos === 'object'){
+        STATE = data;
+        render();
+      }
+    } else if(!firstSnapshotSeen){
+      setDoc(stateRef, DEFAULT_STATE).catch(function(){});
+    }
+    firstSnapshotSeen = true;
+  }, function(err){
+    document.getElementById('connError').hidden = false;
+  });
+</script>
+</body>
+</html>
