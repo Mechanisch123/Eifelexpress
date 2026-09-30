@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eifelexpress🚂</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg: #f3f1ea;
+  --surface: #ffffff;
+  --surface-alt: #ece6d8;
+  --border: #ddd4bd;
+  --ink: #201c14;
+  --ink-muted: #6b6455;
+  --primary: #1f4d8f;
+  --primary-ink: #ffffff;
+  --accent: #d97b2b;
+  --accent-ink: #2b1400;
+  --accent-soft: #f6dfc2;
+  --danger-soft: #f6d4c2;
+  --danger-ink: #5c1a00;
+  --font-display: 'Lexend', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --bg: #14171c;
+    --surface: #1d2128;
+    --surface-alt: #262b33;
+    --border: #333944;
+    --ink: #e9e7df;
+    --ink-muted: #9aa0ab;
+    --primary: #7fa8e0;
+    --primary-ink: #0c1420;
+    --accent: #eb9c4c;
+    --accent-ink: #2b1400;
+    --accent-soft: #4a3520;
+    --danger-soft: #4a2416;
+    --danger-ink: #ffd9c2;
+  }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height:1.5;
+}
+img{max-width:100%;}
+[hidden]{display:none!important;}
+#app{max-width:640px; margin:0 auto; padding-bottom: 20px;}
+.topbar{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding:22px 20px 6px;}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand-mark{color:var(--primary); display:flex;}
+.topbar-actions{display:flex; gap:8px;}
+h1{font-family:var(--font-display); font-size:1.3rem; margin:0; letter-spacing:-0.01em;}
+h2{font-family:var(--font-display); font-size:1rem; margin:0 0 10px;}
+h3{font-family:var(--font-display); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-muted); margin:16px 0 8px; font-weight:600;}
+.icon-btn{background:var(--surface-alt); border:1px solid var(--border); color:var(--ink); border-radius:999px; padding:9px 16px; font-family:var(--font-body); font-size:.85rem; cursor:pointer;}
+.icon-btn:hover{background:var(--border);}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; margin:14px 20px;}
+.hint{color:var(--ink-muted); font-size:.85rem; margin:0 0 12px;}
+.chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{font-family:var(--font-body); font-size:.9rem; padding:9px 16px; border-radius:999px; border:1px solid var(--border); background:var(--surface-alt); color:var(--ink); cursor:pointer; transition: background .15s, border-color .15s, color .15s;}
+.chip-active{background:var(--primary); border-color:var(--primary); color:var(--primary-ink);}
+.suggestion-card{border-color:var(--accent-soft);}
+.next-driver-box{display:flex; flex-direction:column; gap:2px; background:var(--accent-soft); border-radius:10px; padding:14px 16px; margin-bottom:6px;}
+.next-label{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-ink); opacity:.75;}
+.next-name{font-family:var(--font-display); font-size:1.4rem; font-weight:600; color:var(--accent-ink);}
+.next-streak{font-size:.78rem; color:var(--accent-ink); opacity:.85; margin-top:2px;}
+.queue-list{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px;}
+.queue-item{font-variant-numeric: tabular-nums; padding:6px 12px; border-radius:8px; background:var(--surface-alt); border:1px solid var(--border); font-size:.85rem;}
+.queue-item-next{border-color:var(--primary); color:var(--primary); font-weight:600;}
+.last-trip{font-size:.82rem; color:var(--ink-muted); margin-top:10px;}
+.confirm-row{display:flex; flex-wrap:wrap; gap:14px; margin-bottom:12px;}
+.confirm-row label{display:flex; flex-direction:column; gap:4px; font-size:.8rem; color:var(--ink-muted); flex:1; min-width:140px;}
+select, input[type=date], input[type=text], input[type=password]{font-family:var(--font-body); font-size:.9rem; padding:9px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--ink);}
+.btn{font-family:var(--font-body); font-size:.9rem; font-weight:600; padding:10px 18px; border-radius:10px; border:1px solid transparent; cursor:pointer; background:var(--primary); color:var(--primary-ink);}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
+.btn-small{padding:7px 12px; font-size:.8rem;}
+.status-line{font-size:.8rem; color:var(--ink-muted); margin-top:8px;}
+.banner{margin:14px 20px; padding:12px 16px; border-radius:10px; background:var(--danger-soft); color:var(--danger-ink); font-size:.85rem;}
+.banner-info{background:var(--accent-soft); color:var(--accent-ink);}
+.overview-group{margin-bottom:14px;}
+.overview-table{display:flex; flex-direction:column; gap:1px; border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+.overview-row{display:flex; justify-content:space-between; gap:12px; padding:9px 12px; background:var(--surface); font-size:.85rem;}
+.overview-row:nth-child(even){background:var(--surface-alt);}
+.overview-next{color:var(--primary); font-weight:600;}
+.overview-row-header{background:var(--surface-alt)!important; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-muted); font-weight:600;}
+.overview-row-header .overview-next{color:var(--ink-muted);}
+.settings-panel .name-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px;}
+.settings-panel label{display:flex; flex-direction:column; gap:4px; font-size:.78rem; color:var(--ink-muted);}
+.history-list{display:flex; flex-direction:column; gap:1px; border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+.history-row{display:flex; flex-direction:column; gap:6px; padding:9px 12px; background:var(--surface); font-size:.85rem;}
+.history-row:nth-child(even){background:var(--surface-alt);}
+.history-row-main{display:flex; align-items:center; gap:12px;}
+.history-date{font-variant-numeric:tabular-nums; color:var(--ink-muted); min-width:72px;}
+.history-combo{flex:1;}
+.history-driver{font-weight:600; color:var(--primary); white-space:nowrap;}
+.history-delete-btn{background:none; border:none; color:var(--ink-muted); font-size:1.15rem; line-height:1; cursor:pointer; padding:3px 8px; border-radius:6px;}
+.history-delete-btn:hover{background:var(--surface-alt); color:var(--danger-ink);}
+.history-confirm-line{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+.history-pw-input{width:110px;}
+.history-error{color:var(--danger-ink); font-size:.78rem; margin:0;}
+.backup-actions{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+.file-btn{display:inline-flex; align-items:center; font-size:.8rem; padding:7px 12px;}
+.backup-note{font-size:.8rem; color:var(--ink-muted); margin:0;}
+.import-box{background:var(--surface-alt); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; display:flex; flex-direction:column; gap:8px; font-size:.85rem;}
+.foot-note{text-align:center; color:var(--ink-muted); font-size:.75rem; padding:4px 20px 28px;}
+@media (max-width:480px){
+  .name-grid{grid-template-columns:1fr;}
+  .confirm-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="5" cy="19" r="2"></circle>
+          <circle cx="19" cy="5" r="2"></circle>
+          <path d="M7 19h6a3 3 0 0 0 3-3v-2a3 3 0 0 1 3-3" stroke-dasharray="3 3"></path>
+        </svg>
+      </span>
+      <h1>Eifelexpress🚂</h1>
+    </div>
+    <div class="topbar-actions">
+      <button id="toggleHistory" class="icon-btn" type="button" aria-expanded="false">Verlauf</button>
+      <button id="toggleSettings" class="icon-btn" type="button" aria-expanded="false">Namen</button>
+      <button id="toggleBackup" class="icon-btn" type="button" aria-expanded="false">Sicherung</button>
+    </div>
+  </header>
+
+  <p id="connError" class="banner" hidden>Verbindung zur Datenbank nicht möglich. Prüfe deine Internetverbindung – die Seite versucht automatisch, sich neu zu verbinden.</p>
+  <p id="loadingHint" class="banner banner-info">Lade Daten…</p>
+  <p id="setupHint" class="banner banner-info" hidden>Es wurden noch keine Daten gefunden. Bitte einmalig unten die Namen eintragen, um zu starten.</p>
+
+  <section id="historyPanel" class="card history-panel" hidden>
+    <h2>Verlauf</h2>
+    <p class="hint">Alle eingetragenen Fahrten, neueste zuerst.</p>
+    <div id="historyList" class="history-list"></div>
+    <p id="historyEmpty" class="hint" hidden>Noch keine Fahrten eingetragen.</p>
+    <p id="historyStatus" class="status-line" hidden></p>
+  </section>
+
+  <section id="settingsPanel" class="card settings-panel" hidden>
+    <h2>Namen der 4 Personen</h2>
+    <div class="name-grid">
+      <label>Person 1<input type="text" id="name0" maxlength="30"></label>
+      <label>Person 2<input type="text" id="name1" maxlength="30"></label>
+      <label>Person 3<input type="text" id="name2" maxlength="30"></label>
+      <label>Person 4<input type="text" id="name3" maxlength="30"></label>
+    </div>
+    <button id="saveNames" class="btn" type="button" disabled>Namen speichern</button>
+    <p id="namesStatus" class="status-line" hidden></p>
+  </section>
+
+  <section id="backupPanel" class="card" hidden>
+    <h2>Sicherung</h2>
+    <p class="hint">Bei jeder Änderung legt die App automatisch einen Wiederherstellungspunkt in der Datenbank ab. Diese Punkte können weder überschrieben noch gelöscht werden. Zusätzlich kannst du ab und zu eine Sicherungsdatei auf dein Gerät herunterladen.</p>
+    <div class="backup-actions">
+      <button id="downloadBackup" class="btn btn-small" type="button" disabled>Sicherungsdatei herunterladen</button>
+      <button id="loadRestorePoints" class="icon-btn btn-small" type="button" disabled>Wiederherstellungspunkte anzeigen</button>
+      <label class="icon-btn file-btn">Sicherungsdatei einspielen…<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+    </div>
+    <div id="importBox" class="import-box" hidden></div>
+    <div id="restoreList" class="history-list" hidden></div>
+    <p id="backupStatus" class="status-line" hidden></p>
+  </section>
+
+  <section class="card">
+    <h2>Wer fährt heute mit?</h2>
+    <p class="hint">Mindestens zwei Personen auswählen.</p>
+    <div id="peopleChips" class="chip-row"></div>
+  </section>
+
+  <section id="suggestionCard" class="card suggestion-card" hidden>
+    <h2>Diese Kombination</h2>
+    <div id="nextDriverBox" class="next-driver-box"></div>
+    <h3>Reihenfolge</h3>
+    <ol id="queueList" class="queue-list"></ol>
+    <p id="lastTripInfo" class="last-trip" hidden></p>
+
+    <h3>Fahrt eintragen</h3>
+    <div class="confirm-row">
+      <label>Gefahren ist
+        <select id="driverSelect"></select>
+      </label>
+      <label>Datum
+        <input type="date" id="tripDate">
+      </label>
+    </div>
+    <button id="confirmTrip" class="btn" type="button" disabled>Fahrt speichern</button>
+    <p id="confirmStatus" class="status-line" hidden></p>
+  </section>
+
+  <section class="card">
+    <h2>Übersicht aller Kombinationen</h2>
+    <div id="overviewGroups"></div>
+  </section>
+
+  <p class="foot-note">Änderungen werden für alle vier gespeichert und live an alle übertragen.</p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getFirestore, doc, collection, onSnapshot, runTransaction, serverTimestamp, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyDnBB5o1QVtt85ZoPMIREyNH-Ri66kSeHw",
+    authDomain: "eifelexpress-d5225.firebaseapp.com",
+    projectId: "eifelexpress-d5225",
+    storageBucket: "eifelexpress-d5225.firebasestorage.app",
+    messagingSenderId: "609356386373",
+    appId: "1:609356386373:web:b6fe60a667a64d2343932c"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+  var stateRef = doc(db, "state", "shared");
+  var backupsCol = collection(db, "backups");
+
+  var DEFAULT_STATE = {
+    names: ["Fahrer 1","Fahrer 2","Fahrer 3","Fahrer 4"],
+    combos: {}
+  };
+
+  var STATE = cloneState(DEFAULT_STATE);
+  var selected = new Set();
+  var saving = false;
+  // serverConfirmed: der zuletzt empfangene Stand kommt nachweislich vom
+  // Server (nicht aus einem Zwischenspeicher, z.B. im Funkloch). Nur dann
+  // sind Speichern-Buttons aktiv.
+  var serverConfirmed = false;
+  var everConfirmed = false;
+  // docMissing: Server hat bestätigt, dass es (noch) keine Daten gibt.
+  // Die App legt dann NICHTS automatisch an.
+  var docMissing = false;
+  var slowLoad = false;
+  var DELETE_PASSWORD = '1702';
+  var pendingDelete = null;
+  var deleteError = false;
+  var restorePoints = null;
+  var pendingRestore = null;
+  var restoreError = false;
+  var importCandidate = null;
+  var importError = false;
+  // Nur wenn jemand im Dropdown "Gefahren ist" bewusst eine andere Person
+  // wählt, wird diese gemerkt - sonst steht dort immer der aktuelle Vorschlag.
+  var driverManual = null;
+
+  // ---------- Datenmodell ----------
+
+  function cloneState(s){ return JSON.parse(JSON.stringify(s)); }
+
+  // Baut einen sauberen Zustand nur aus names + combos (die Firestore-Regeln
+  // erlauben keine weiteren Felder).
+  function buildState(names, combos){
+    return {names: cloneState(names), combos: cloneState(combos || {})};
+  }
+
+  function isValidState(d){
+    if(!d || typeof d !== 'object') return false;
+    if(Object.keys(d).some(function(k){ return k !== 'names' && k !== 'combos'; })) return false;
+    if(!Array.isArray(d.names) || d.names.length !== 4) return false;
+    if(!d.names.every(function(n){ return typeof n === 'string'; })) return false;
+    if(!d.combos || typeof d.combos !== 'object' || Array.isArray(d.combos)) return false;
+    return Object.keys(d.combos).every(function(k){
+      var c = d.combos[k];
+      if(!c || typeof c !== 'object') return false;
+      if(c.history === undefined) return true;
+      if(!Array.isArray(c.history)) return false;
+      return c.history.every(function(h){ return h && typeof h.date === 'string' && typeof h.driver === 'number'; });
+    });
+  }
+
+  function countTrips(s){
+    return Object.keys(s.combos || {}).reduce(function(sum, k){
+      var c = s.combos[k];
+      return sum + ((c && Array.isArray(c.history)) ? c.history.length : 0);
+    }, 0);
+  }
+
+  function histOf(s, key){
+    var c = s.combos[key];
+    return (c && Array.isArray(c.history)) ? c.history.slice() : [];
+  }
+
+  // Jede Änderung ist eine Funktion "alter Serverstand -> neuer Stand".
+  // Sie wird innerhalb einer Transaktion auf den FRISCH vom Server gelesenen
+  // Stand angewendet - nie auf den evtl. veralteten Stand im Browser.
+  function opAddTrip(key, entry){
+    return function(cur){
+      if(!cur) throw userError('Bitte zuerst unter „Namen“ die vier Namen speichern.');
+      var next = buildState(cur.names, cur.combos);
+      next.combos[key] = {history: [entry].concat(histOf(next, key))};
+      return next;
+    };
+  }
+
+  function opDeleteTrip(key, date, driver){
+    return function(cur){
+      if(!cur) throw userError('Eintrag existiert nicht mehr.');
+      var next = buildState(cur.names, cur.combos);
+      var hist = histOf(next, key);
+      var idx = -1;
+      for(var i=0;i<hist.length;i++){ if(hist[i].date === date && hist[i].driver === driver){ idx = i; break; } }
+      if(idx === -1) throw userError('Eintrag existiert nicht mehr (evtl. hat ihn gerade jemand anderes gelöscht).');
+      hist.splice(idx, 1);
+      next.combos[key] = {history: hist};
+      return next;
+    };
+  }
+
+  function opSetNames(rawNames){
+    return function(cur){
+      var base = cur || DEFAULT_STATE;
+      var names = rawNames.map(function(v, i){ return v || base.names[i] || ('Person ' + (i+1)); });
+      return buildState(names, base.combos);
+    };
+  }
+
+  function opReplaceAll(newState){
+    return function(){ return buildState(newState.names, newState.combos); };
+  }
+
+  // ---------- Speichern ----------
+
+  function userError(msg){ var e = new Error(msg); e.userMessage = msg; return e; }
+
+  function describeError(err){
+    if(err && err.userMessage) return err.userMessage;
+    var code = err && err.code ? String(err.code) : '';
+    if(code.indexOf('unavailable') !== -1 || code.indexOf('failed-precondition') !== -1) return 'Keine Verbindung zur Datenbank. Bitte später nochmal versuchen.';
+    if(code.indexOf('permission-denied') !== -1) return 'Zugriff verweigert – sind die neuen Firestore-Regeln eingetragen?';
+    if(code.indexOf('aborted') !== -1) return 'Gleichzeitige Änderung von jemand anderem – bitte nochmal versuchen.';
+    return (err && err.message) ? err.message : 'unbekannter Fehler';
+  }
+
+  function setStatus(el, text, autoHide){
+    if(!el) return;
+    el.hidden = false;
+    el.textContent = text;
+    if(autoHide){
+      setTimeout(function(){ if(el.textContent === text) el.hidden = true; }, 2000);
+    }
+  }
+
+  function canWrite(){ return serverConfirmed && !saving; }
+
+  // Einziger Weg, auf dem die App schreibt:
+  // 1. aktuellen Stand frisch vom Server lesen (Transaktion),
+  // 2. nur die gewünschte Änderung darauf anwenden,
+  // 3. neuen Stand speichern UND als Wiederherstellungspunkt ablegen.
+  // Offline schlägt eine Transaktion fehl, statt blind zu überschreiben.
+  function commit(op, reason, statusEl, opts){
+    opts = opts || {};
+    if(!serverConfirmed){
+      setStatus(statusEl, 'Keine bestätigte Verbindung zur Datenbank – nichts gespeichert.', false);
+      return Promise.resolve(false);
+    }
+    if(saving) return Promise.resolve(false);
+    saving = true; render();
+    setStatus(statusEl, 'Speichere…', false);
+    return runTransaction(db, function(tx){
+      return tx.get(stateRef).then(function(snap){
+        var cur = null;
+        var curValid = false;
+        if(snap.exists()){
+          cur = snap.data();
+          curValid = isValidState(cur);
+          if(!curValid && !opts.ignoreCurrent){
+            throw userError('Die Daten in der Datenbank haben ein unerwartetes Format – aus Sicherheitsgründen wurde nichts gespeichert. Unter „Sicherung“ kannst du einen früheren Stand wiederherstellen.');
+          }
+        }
+        var next = op(curValid ? cur : null);
+        if(!isValidState(next)) throw userError('Interner Fehler – nichts gespeichert.');
+        if(opts.backupCurrentFirst && curValid){
+          tx.set(doc(backupsCol), {state: buildState(cur.names, cur.combos), reason: 'Stand vor: ' + String(reason).slice(0,200), createdAt: serverTimestamp()});
+        }
+        tx.set(stateRef, next);
+        tx.set(doc(backupsCol), {state: next, reason: String(reason).slice(0,250), createdAt: serverTimestamp()});
+      });
+    }).then(function(){
+      setStatus(statusEl, 'Gespeichert.', true);
+      return true;
+    }).catch(function(err){
+      setStatus(statusEl, 'Nicht gespeichert: ' + describeError(err), false);
+      return false;
+    }).finally(function(){
+      saving = false; render();
+    });
+  }
+
+  // ---------- Hilfsfunktionen ----------
+
+  function comboKey(idxs){ return idxs.slice().sort(function(a,b){return a-b;}).join('-'); }
+
+  function combinations(arr, k){
+    var out = [];
+    function rec(start, chosen){
+      if(chosen.length === k){ out.push(chosen.slice()); return; }
+      for(var i=start;i<arr.length;i++){ chosen.push(arr[i]); rec(i+1, chosen); chosen.pop(); }
+    }
+    rec(0, []);
+    return out;
+  }
+
+  function allCombos(){
+    var idxs = [0,1,2,3];
+    var res = [];
+    [2,3,4].forEach(function(k){
+      combinations(idxs,k).forEach(function(c){ res.push({key: comboKey(c), idxs: c, size: k}); });
+    });
+    return res;
+  }
+
+  function getHistory(key){
+    var entry = STATE.combos[key];
+    return (entry && Array.isArray(entry.history)) ? entry.history : [];
+  }
+
+  // Zählt für eine Kombination, wie oft jede Person laut Verlauf gefahren ist,
+  // und wann sie zuletzt dran war. Wird bei jedem Render frisch aus dem
+  // Verlauf berechnet - so passt sich "wer ist dran" automatisch an, wenn
+  // z.B. ein Verlaufseintrag gelöscht wird.
+  // lastDate = spätestes (echtes) Datum, an dem diese Person laut Verlauf
+  // gefahren ist - das zählt, nicht die Reihenfolge der Eintragung, damit
+  // auch rückwirkend nachgetragene Fahrten korrekt einsortiert werden.
+  function getStats(key, idxs){
+    var hist = getHistory(key);
+    var counts = {};
+    var lastDate = {};
+    idxs.forEach(function(i){ counts[i] = 0; lastDate[i] = null; });
+    hist.forEach(function(h){
+      if(counts.hasOwnProperty(h.driver)){
+        counts[h.driver] += 1;
+        if(!lastDate[h.driver] || h.date > lastDate[h.driver]) lastDate[h.driver] = h.date;
+      }
+    });
+    return {counts: counts, lastDate: lastDate};
+  }
+
+  // Reihenfolge: wenigste Fahrten zuerst; bei Gleichstand, wer am längsten
+  // nicht (bzw. noch nie) gefahren ist; letzter Tiebreak nach fester Reihenfolge
+  // (greift nur, wenn zwei Personen exakt dasselbe letzte Datum haben).
+  function getRanking(key, idxs){
+    var stats = getStats(key, idxs);
+    var ranked = idxs.slice().sort(function(a,b){
+      if(stats.counts[a] !== stats.counts[b]) return stats.counts[a] - stats.counts[b];
+      var da = stats.lastDate[a], db = stats.lastDate[b];
+      if(da !== db){
+        if(!da) return -1;
+        if(!db) return 1;
+        return da < db ? -1 : 1;
+      }
+      return a - b;
+    });
+    return {ranked: ranked, stats: stats};
+  }
+
+  function nameOf(i){ return STATE.names[i] || ('Person ' + (i+1)); }
+
+  function todayISO(){
+    var d = new Date();
+    var local = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+    return local.toISOString().slice(0,10);
+  }
+
+  function fmtDate(iso){
+    if(!iso) return '';
+    var parts = iso.split('-');
+    if(parts.length!==3) return iso;
+    return parts[2] + '.' + parts[1] + '.' + parts[0];
+  }
+
+  function fmtDateTime(d){
+    if(!d) return '–';
+    function p(n){ return (n<10?'0':'') + n; }
+    return p(d.getDate()) + '.' + p(d.getMonth()+1) + '.' + d.getFullYear() + ', ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  // ---------- Darstellung ----------
+
+  function render(){
+    renderStatusHints();
+    renderNameInputs();
+    renderChips();
+    renderSuggestion();
+    renderOverview();
+    renderHistory();
+    renderBackup();
+  }
+
+  function renderStatusHints(){
+    var lh = document.getElementById('loadingHint');
+    if(serverConfirmed){
+      lh.hidden = true;
+    } else {
+      lh.hidden = false;
+      if(everConfirmed) lh.textContent = 'Offline – die Anzeige ist evtl. nicht aktuell. Speichern ist gesperrt, bis die Verbindung wieder steht.';
+      else if(slowLoad) lh.textContent = 'Keine Verbindung zur Datenbank. Bitte Internetverbindung prüfen – Speichern ist so lange gesperrt.';
+      else lh.textContent = 'Lade Daten…';
+    }
+    document.getElementById('setupHint').hidden = !(serverConfirmed && docMissing);
+    document.getElementById('saveNames').disabled = !canWrite();
+  }
+
+  function renderNameInputs(){
+    for(var i=0;i<4;i++){
+      var inp = document.getElementById('name'+i);
+      if(inp && document.activeElement !== inp) inp.value = STATE.names[i];
+    }
+  }
+
+  function renderChips(){
+    var wrap = document.getElementById('peopleChips');
+    wrap.innerHTML = '';
+    for(var i=0;i<4;i++){
+      (function(i){
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip' + (selected.has(i) ? ' chip-active' : '');
+        btn.textContent = nameOf(i);
+        btn.addEventListener('click', function(){
+          if(selected.has(i)) selected.delete(i); else selected.add(i);
+          driverManual = null;
+          render();
+        });
+        wrap.appendChild(btn);
+      })(i);
+    }
+  }
+
+  function renderSuggestion(){
+    var card = document.getElementById('suggestionCard');
+    if(selected.size < 2){ card.hidden = true; return; }
+    card.hidden = false;
+    var idxs = Array.from(selected).sort(function(a,b){return a-b;});
+    var key = comboKey(idxs);
+    var rankInfo = getRanking(key, idxs);
+    var order = rankInfo.ranked;
+    var counts = rankInfo.stats.counts;
+    var nextIdx = order[0];
+    var maxCount = Math.max.apply(null, idxs.map(function(i){ return counts[i]; }));
+    var owed = maxCount - counts[nextIdx];
+
+    var box = document.getElementById('nextDriverBox');
+    box.innerHTML = '';
+    var lbl = document.createElement('span');
+    lbl.className = 'next-label';
+    lbl.textContent = 'Als nächstes fährt:';
+    var nm = document.createElement('span');
+    nm.className = 'next-name';
+    nm.textContent = nameOf(nextIdx);
+    box.appendChild(lbl);
+    box.appendChild(nm);
+    if(owed >= 2){
+      var streak = document.createElement('span');
+      streak.className = 'next-streak';
+      streak.textContent = 'noch ' + owed + '× in Folge, um aufzuholen';
+      box.appendChild(streak);
+    }
+
+    var list = document.getElementById('queueList');
+    list.innerHTML = '';
+    order.forEach(function(idx,pos){
+      var li = document.createElement('li');
+      li.className = 'queue-item' + (pos===0 ? ' queue-item-next' : '');
+      var n = counts[idx];
+      li.textContent = (pos+1) + '. ' + nameOf(idx) + ' (' + n + '× gefahren)';
+      list.appendChild(li);
+    });
+
+    var hist = getHistory(key);
+    var lastInfo = document.getElementById('lastTripInfo');
+    if(hist.length){
+      lastInfo.hidden = false;
+      lastInfo.textContent = 'Zuletzt gefahren: ' + nameOf(hist[0].driver) + ' am ' + fmtDate(hist[0].date);
+    } else {
+      lastInfo.hidden = true;
+      lastInfo.textContent = '';
+    }
+
+    var sel = document.getElementById('driverSelect');
+    sel.innerHTML = '';
+    idxs.forEach(function(idx){
+      var opt = document.createElement('option');
+      opt.value = String(idx);
+      opt.textContent = nameOf(idx);
+      sel.appendChild(opt);
+    });
+    sel.value = (driverManual !== null && idxs.indexOf(driverManual) !== -1) ? String(driverManual) : String(nextIdx);
+
+    var dateInput = document.getElementById('tripDate');
+    if(!dateInput.value) dateInput.value = todayISO();
+
+    document.getElementById('confirmTrip').disabled = !canWrite();
+  }
+
+  function renderOverview(){
+    var wrap = document.getElementById('overviewGroups');
+    wrap.innerHTML = '';
+    var groups = [[2,'Zu zweit'],[3,'Zu dritt'],[4,'Alle vier']];
+    var combos = allCombos();
+    groups.forEach(function(g){
+      var size = g[0], label = g[1];
+      var items = combos.filter(function(c){ return c.size===size; });
+      var groupEl = document.createElement('div');
+      groupEl.className = 'overview-group';
+      var h3 = document.createElement('h3');
+      h3.textContent = label;
+      groupEl.appendChild(h3);
+      var table = document.createElement('div');
+      table.className = 'overview-table';
+
+      var headerRow = document.createElement('div');
+      headerRow.className = 'overview-row overview-row-header';
+      var headMembers = document.createElement('span');
+      headMembers.className = 'overview-members';
+      headMembers.textContent = 'Kombination';
+      var headNext = document.createElement('span');
+      headNext.className = 'overview-next';
+      headNext.textContent = 'Als nächstes fährt:';
+      headerRow.appendChild(headMembers);
+      headerRow.appendChild(headNext);
+      table.appendChild(headerRow);
+
+      items.forEach(function(c){
+        var rankInfo = getRanking(c.key, c.idxs);
+        var order = rankInfo.ranked;
+        var row = document.createElement('div');
+        row.className = 'overview-row';
+        var membersEl = document.createElement('span');
+        membersEl.className = 'overview-members';
+        membersEl.textContent = c.idxs.map(nameOf).join(' + ');
+        var nextEl = document.createElement('span');
+        nextEl.className = 'overview-next';
+        nextEl.textContent = nameOf(order[0]);
+        row.appendChild(membersEl);
+        row.appendChild(nextEl);
+        table.appendChild(row);
+      });
+      groupEl.appendChild(table);
+      wrap.appendChild(groupEl);
+    });
+  }
+
+  // Baut eine Zeile "Passwort + Bestätigen + Abbrechen" (+ Fehlermeldung).
+  function buildPasswordConfirm(label, showError, errorText, onConfirm, onCancel){
+    var frag = document.createElement('div');
+    frag.className = 'history-confirm-line';
+    var pwInput = document.createElement('input');
+    pwInput.type = 'password';
+    pwInput.placeholder = 'Passwort';
+    pwInput.className = 'history-pw-input';
+    var confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'btn btn-small';
+    confirmBtn.textContent = label;
+    confirmBtn.disabled = !canWrite();
+    confirmBtn.addEventListener('click', function(){ onConfirm(pwInput.value); });
+    pwInput.addEventListener('keydown', function(ev){ if(ev.key === 'Enter' && !confirmBtn.disabled) confirmBtn.click(); });
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'icon-btn btn-small';
+    cancelBtn.textContent = 'Abbrechen';
+    cancelBtn.addEventListener('click', onCancel);
+    frag.appendChild(pwInput);
+    frag.appendChild(confirmBtn);
+    frag.appendChild(cancelBtn);
+    var wrap = document.createElement('div');
+    wrap.appendChild(frag);
+    if(showError){
+      var errEl = document.createElement('p');
+      errEl.className = 'history-error';
+      errEl.textContent = errorText;
+      wrap.appendChild(errEl);
+    }
+    return wrap;
+  }
+
+  function focusPw(container){
+    var inp = container.querySelector('.history-pw-input');
+    if(inp) inp.focus();
+  }
+
+  function renderHistory(){
+    var list = document.getElementById('historyList');
+    var emptyMsg = document.getElementById('historyEmpty');
+    list.innerHTML = '';
+    var rows = [];
+    Object.keys(STATE.combos).forEach(function(key){
+      var entry = STATE.combos[key];
+      var idxs = key.split('-').map(Number);
+      var hist = (entry && Array.isArray(entry.history)) ? entry.history : [];
+      hist.forEach(function(h){
+        rows.push({date: h.date, driver: h.driver, idxs: idxs, key: key, entryRef: h});
+      });
+    });
+    rows.sort(function(a,b){
+      if(a.date === b.date) return 0;
+      return a.date < b.date ? 1 : -1;
+    });
+    if(rows.length === 0){
+      emptyMsg.hidden = false;
+      return;
+    }
+    emptyMsg.hidden = true;
+    rows.forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'history-row';
+
+      var mainLine = document.createElement('div');
+      mainLine.className = 'history-row-main';
+
+      var dateEl = document.createElement('span');
+      dateEl.className = 'history-date';
+      dateEl.textContent = fmtDate(r.date);
+      var comboEl = document.createElement('span');
+      comboEl.className = 'history-combo';
+      comboEl.textContent = r.idxs.map(nameOf).join(' + ');
+      var driverEl = document.createElement('span');
+      driverEl.className = 'history-driver';
+      driverEl.textContent = nameOf(r.driver);
+
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'history-delete-btn';
+      delBtn.setAttribute('aria-label', 'Eintrag löschen');
+      delBtn.textContent = '×';
+      delBtn.addEventListener('click', function(){
+        var isSame = pendingDelete && pendingDelete.entryRef === r.entryRef;
+        pendingDelete = isSame ? null : {key: r.key, entryRef: r.entryRef};
+        deleteError = false;
+        renderHistory();
+        focusPw(list);
+      });
+
+      mainLine.appendChild(dateEl);
+      mainLine.appendChild(comboEl);
+      mainLine.appendChild(driverEl);
+      mainLine.appendChild(delBtn);
+      row.appendChild(mainLine);
+
+      if(pendingDelete && pendingDelete.entryRef === r.entryRef){
+        row.appendChild(buildPasswordConfirm('Löschen', deleteError, 'Falsches Passwort.', function(pw){
+          if(pw !== DELETE_PASSWORD){ deleteError = true; renderHistory(); focusPw(list); return; }
+          pendingDelete = null;
+          deleteError = false;
+          var reason = 'Fahrt gelöscht: ' + nameOf(r.driver) + ' (' + r.idxs.map(nameOf).join(' + ') + ') am ' + fmtDate(r.date);
+          commit(opDeleteTrip(r.key, r.date, r.driver), reason, document.getElementById('historyStatus'));
+        }, function(){
+          pendingDelete = null; deleteError = false; renderHistory();
+        }));
+      }
+
+      list.appendChild(row);
+    });
+  }
+
+  function renderBackup(){
+    document.getElementById('downloadBackup').disabled = !everConfirmed || docMissing;
+    document.getElementById('loadRestorePoints').disabled = !serverConfirmed;
+
+    // Datei-Import
+    var box = document.getElementById('importBox');
+    box.innerHTML = '';
+    if(importCandidate){
+      box.hidden = false;
+      var s = importCandidate.state;
+      var info = document.createElement('p');
+      info.className = 'backup-note';
+      info.textContent = 'Datei „' + importCandidate.fileName + '“: ' + s.names.join(', ') + ' – ' + countTrips(s) + ' Fahrten. Einspielen ersetzt den aktuellen Stand komplett (der aktuelle Stand bleibt als Wiederherstellungspunkt erhalten).';
+      box.appendChild(info);
+      box.appendChild(buildPasswordConfirm('Einspielen', importError, 'Falsches Passwort.', function(pw){
+        if(pw !== DELETE_PASSWORD){ importError = true; renderBackup(); focusPw(box); return; }
+        var cand = importCandidate;
+        importCandidate = null; importError = false;
+        commit(opReplaceAll(cand.state), 'Sicherungsdatei eingespielt (' + cand.fileName + ')', document.getElementById('backupStatus'), {backupCurrentFirst: true, ignoreCurrent: true})
+          .then(function(ok){ if(ok && restorePoints) loadRestorePoints(); });
+      }, function(){
+        importCandidate = null; importError = false; renderBackup();
+      }));
+    } else {
+      box.hidden = true;
+    }
+
+    // Wiederherstellungspunkte
+    var list = document.getElementById('restoreList');
+    list.innerHTML = '';
+    if(restorePoints === null){ list.hidden = true; return; }
+    list.hidden = false;
+    if(restorePoints.length === 0){
+      var empty = document.createElement('div');
+      empty.className = 'history-row';
+      empty.textContent = 'Noch keine Wiederherstellungspunkte vorhanden – der erste entsteht bei der nächsten Änderung.';
+      list.appendChild(empty);
+      return;
+    }
+    restorePoints.forEach(function(b){
+      var row = document.createElement('div');
+      row.className = 'history-row';
+      var main = document.createElement('div');
+      main.className = 'history-row-main';
+      var when = document.createElement('span');
+      when.className = 'history-date';
+      when.textContent = fmtDateTime(b.createdAt);
+      var what = document.createElement('span');
+      what.className = 'history-combo';
+      what.textContent = b.reason + ' – ' + countTrips(b.state) + ' Fahrten';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'icon-btn btn-small';
+      btn.textContent = 'Wiederherstellen';
+      btn.addEventListener('click', function(){
+        pendingRestore = (pendingRestore === b.id) ? null : b.id;
+        restoreError = false;
+        renderBackup();
+        focusPw(list);
+      });
+      main.appendChild(when);
+      main.appendChild(what);
+      main.appendChild(btn);
+      row.appendChild(main);
+      if(pendingRestore === b.id){
+        var note = document.createElement('p');
+        note.className = 'backup-note';
+        note.textContent = 'Setzt alles auf diesen Stand zurück (Namen: ' + b.state.names.join(', ') + '). Der aktuelle Stand bleibt als Wiederherstellungspunkt erhalten.';
+        row.appendChild(note);
+        row.appendChild(buildPasswordConfirm('Wiederherstellen', restoreError, 'Falsches Passwort.', function(pw){
+          if(pw !== DELETE_PASSWORD){ restoreError = true; renderBackup(); focusPw(list); return; }
+          pendingRestore = null; restoreError = false;
+          commit(opReplaceAll(b.state), 'Wiederherstellung auf Stand vom ' + fmtDateTime(b.createdAt), document.getElementById('backupStatus'), {backupCurrentFirst: true, ignoreCurrent: true})
+            .then(function(ok){ if(ok) loadRestorePoints(); });
+        }, function(){
+          pendingRestore = null; restoreError = false; renderBackup();
+        }));
+      }
+      list.appendChild(row);
+    });
+  }
+
+  function loadRestorePoints(){
+    var statusEl = document.getElementById('backupStatus');
+    setStatus(statusEl, 'Lade Wiederherstellungspunkte…', false);
+    return getDocs(query(backupsCol, orderBy('createdAt', 'desc'), limit(30))).then(function(qs){
+      var pts = [];
+      qs.forEach(function(d){
+        var b = d.data();
+        if(b && isValidState(b.state)){
+          pts.push({id: d.id, state: b.state, reason: b.reason || '', createdAt: (b.createdAt && b.createdAt.toDate) ? b.createdAt.toDate() : null});
+        }
+      });
+      restorePoints = pts;
+      statusEl.hidden = true;
+      renderBackup();
+    }).catch(function(err){
+      setStatus(statusEl, 'Wiederherstellungspunkte konnten nicht geladen werden: ' + describeError(err), false);
+    });
+  }
+
+  function downloadBackup(){
+    var payload = {app: 'Eifelexpress', exportedAt: new Date().toISOString(), state: buildState(STATE.names, STATE.combos)};
+    var blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'eifelexpress-sicherung-' + todayISO() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
+  // ---------- Bedienelemente ----------
+
+  function wireToggle(btnId, panelId){
+    document.getElementById(btnId).addEventListener('click', function(){
+      var panel = document.getElementById(panelId);
+      panel.hidden = !panel.hidden;
+      document.getElementById(btnId).setAttribute('aria-expanded', String(!panel.hidden));
+    });
+  }
+  wireToggle('toggleSettings', 'settingsPanel');
+  wireToggle('toggleHistory', 'historyPanel');
+  wireToggle('toggleBackup', 'backupPanel');
+
+  document.getElementById('saveNames').addEventListener('click', function(){
+    var raw = [0,1,2,3].map(function(i){ return document.getElementById('name'+i).value.trim(); });
+    commit(opSetNames(raw), 'Namen gespeichert: ' + raw.filter(Boolean).join(', '), document.getElementById('namesStatus'));
+  });
+
+  document.getElementById('confirmTrip').addEventListener('click', function(){
+    if(selected.size < 2) return;
+    var idxs = Array.from(selected).sort(function(a,b){return a-b;});
+    var key = comboKey(idxs);
+    var rawDriver = document.getElementById('driverSelect').value;
+    if(rawDriver === '') return;
+    var driverIdx = Number(rawDriver);
+    if(idxs.indexOf(driverIdx) === -1) return;
+    var date = document.getElementById('tripDate').value || todayISO();
+    var reason = 'Fahrt eingetragen: ' + nameOf(driverIdx) + ' (' + idxs.map(nameOf).join(' + ') + ') am ' + fmtDate(date);
+    commit(opAddTrip(key, {date: date, driver: driverIdx}), reason, document.getElementById('confirmStatus'))
+      .then(function(ok){ if(ok){ driverManual = null; render(); } });
+  });
+
+  document.getElementById('driverSelect').addEventListener('change', function(ev){
+    driverManual = ev.target.value === '' ? null : Number(ev.target.value);
+  });
+
+  document.getElementById('downloadBackup').addEventListener('click', downloadBackup);
+  document.getElementById('loadRestorePoints').addEventListener('click', loadRestorePoints);
+
+  document.getElementById('importFile').addEventListener('change', function(ev){
+    var file = ev.target.files && ev.target.files[0];
+    ev.target.value = '';
+    if(!file) return;
+    var statusEl = document.getElementById('backupStatus');
+    file.text().then(function(text){
+      var parsed = JSON.parse(text);
+      var raw = (parsed && parsed.state) ? parsed.state : parsed;
+      var cand = (raw && Array.isArray(raw.names)) ? buildState(raw.names, raw.combos) : null;
+      if(!cand || !isValidState(cand)) throw new Error('invalid');
+      importCandidate = {state: cand, fileName: file.name};
+      importError = false;
+      statusEl.hidden = true;
+      renderBackup();
+      focusPw(document.getElementById('importBox'));
+    }).catch(function(){
+      importCandidate = null;
+      setStatus(statusEl, 'Diese Datei ist keine gültige Eifelexpress-Sicherung.', false);
+      renderBackup();
+    });
+  });
+
+  render();
+
+  setTimeout(function(){ slowLoad = true; render(); }, 8000);
+
+  // WICHTIG: Der Listener LIEST nur. Er schreibt niemals von sich aus.
+  // Snapshots aus dem Zwischenspeicher (fromCache, z.B. im Funkloch) werden
+  // angezeigt, geben aber keine Schreibrechte frei - und ein "Dokument
+  // existiert nicht" aus dem Zwischenspeicher wird komplett ignoriert.
+  onSnapshot(stateRef, {includeMetadataChanges: true}, function(snap){
+    document.getElementById('connError').hidden = true;
+    var fromCache = snap.metadata.fromCache;
+    if(snap.exists()){
+      var data = snap.data();
+      if(isValidState(data)){
+        STATE = data;
+        docMissing = false;
+      } else {
+        console.error('Eifelexpress: Dokument hat ein unerwartetes Format, wird nur angezeigt, nicht überschrieben.', data);
+      }
+    } else if(!fromCache){
+      if(!docMissing){
+        document.getElementById('settingsPanel').hidden = false;
+        document.getElementById('toggleSettings').setAttribute('aria-expanded', 'true');
+      }
+      docMissing = true;
+    }
+    serverConfirmed = !fromCache;
+    if(serverConfirmed) everConfirmed = true;
+    render();
+  }, function(err){
+    serverConfirmed = false;
+    document.getElementById('connError').hidden = false;
+    render();
+  });
+</script>
+</body>
+</html>
